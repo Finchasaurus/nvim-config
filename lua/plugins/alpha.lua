@@ -1,17 +1,13 @@
 local banners = require("tables.banners")
+local tableUtil = require("util.table")
+local cacheUtil = require("util.cache")
+local strintUtil = require("util.string")
+
 local cachedFile = vim.fn.stdpath("config") .. "/cache/quote.json"
 math.randomseed(os.time())
 
 local banner = nil
 local quote_placeholder = "Fetching quote..."
-
-local function getRandomKey(tbl)
-    local keys = {}
-    for key in pairs(tbl) do
-        table.insert(keys, key)
-    end
-    return keys[math.random(#keys)]
-end
 
 local function btn_gen(label, shortcut, hl_label, hl_icon)
     return {
@@ -32,57 +28,10 @@ local function btn_gen(label, shortcut, hl_label, hl_icon)
     }
 end
 
-local function wrapText(inputText, maxLength)
-    local wrappedText = {}
-    local currentLine = ""
-
-    for word in inputText:gmatch("%S+") do
-        if #currentLine + #word + 1 <= maxLength then
-            if currentLine == "" then
-                currentLine = word
-            else
-                currentLine = currentLine .. " " .. word
-            end
-        else
-            table.insert(wrappedText, currentLine)
-            currentLine = word
-        end
-    end
-
-    if currentLine ~= "" then
-        table.insert(wrappedText, currentLine)
-    end
-
-    return table.concat(wrappedText, "\n")
-end
-
-local function loadCache()
-    local file = io.open(cachedFile, "r");
-    if file then
-        local content = file:read("*all")
-        file:close()
-        if content ~= "" then
-            return vim.fn.json_decode(content)
-        end
-    end
-end
-
-local function saveCache(quote, timestamp)
-    local data = {
-        quote = quote,
-        timestamp = timestamp
-    }
-    local file = io.open(cachedFile, "w")
-    if file then
-        file:write(vim.fn.json_encode(data))
-        file:close()
-    end
-end
-
 local function fetchQuote(callback)
     local api_url = "https://animechan.io/api/v1/quotes/random"
     local currentTime = os.time()
-    local cachedData = loadCache()
+    local cachedData = cacheUtil.loadCache(cachedFile)
 
     if cachedData and (currentTime - cachedData.timestamp) < 3600 then
         callback(cachedData.quote)
@@ -101,11 +50,13 @@ local function fetchQuote(callback)
                         decoded.data.character.name then
                         local quote = string.format('"%s" - %s', decoded.data.content, decoded.data.character.name)
 
-                        saveCache(quote, currentTime)
+                        cacheUtil.saveCache(cachedFile, {
+                            quote = quote,
+                            timestamp = currentTime
+                        })
 
-                        callback(wrapText(quote, 64))
+                        callback(stringUtil.wrap(quote, 64))
                     else
-                        saveCache('"my penits go boing boing boing - theo"', currentTime)
                         callback("Error: Could not fetch quote - " .. decoded.message)
                     end
                 end)
@@ -118,7 +69,7 @@ end
 
 local heading = {
     type = "text",
-    val = banners[banner and banner or getRandomKey(banners)],
+    val = banners[banner and banner or tableUtil.getRandomKey(banners)],
     opts = {
         position = "center"
     }
