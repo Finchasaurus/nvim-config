@@ -1,0 +1,193 @@
+local banners = require("tables.banners")
+local cachedFile = vim.fn.stdpath("config") .. "/cache/quote.json"
+math.randomseed(os.time())
+
+local banner = nil
+local quote_placeholder = "Fetching quote..."
+
+local function getRandomKey(tbl)
+    local keys = {}
+    for key in pairs(tbl) do
+        table.insert(keys, key)
+    end
+    return keys[math.random(#keys)]
+end
+
+local function btn_gen(label, shortcut, hl_label, hl_icon)
+    return {
+        type = "button",
+        on_press = function()
+            local key = api.nvim_replace_termcodes(shortcut:gsub("%s", ""):gsub("LDR", "<leader>"), true, false, true)
+            api.nvim_feedkeys(key, "normal", false)
+        end,
+        val = label,
+        opts = {
+            position = "center",
+            shortcut = shortcut,
+            cursor = 5,
+            width = 25,
+            align_shortcut = "right",
+            hl_shortcut = "AlphaKeyPrefix"
+        }
+    }
+end
+
+local function wrapText(inputText, maxLength)
+    local wrappedText = {}
+    local currentLine = ""
+
+    for word in inputText:gmatch("%S+") do
+        if #currentLine + #word + 1 <= maxLength then
+            if currentLine == "" then
+                currentLine = word
+            else
+                currentLine = currentLine .. " " .. word
+            end
+        else
+            table.insert(wrappedText, currentLine)
+            currentLine = word
+        end
+    end
+
+    if currentLine ~= "" then
+        table.insert(wrappedText, currentLine)
+    end
+
+    return table.concat(wrappedText, "\n")
+end
+
+local function loadCache()
+    local file = io.open(cachedFile, "r");
+    if file then
+        local content = file:read("*all")
+        file:close()
+        if content ~= "" then
+            return vim.fn.json_decode(content)
+        end
+    end
+end
+
+local function saveCache(quote, timestamp)
+    local data = {
+        quote = quote,
+        timestamp = timestamp
+    }
+    local file = io.open(cachedFile, "w")
+    if file then
+        file:write(vim.fn.json_encode(data))
+        file:close()
+    end
+end
+
+local function fetchQuote(callback)
+    local api_url = "https://animechan.io/api/v1/quotes/random"
+    local currentTime = os.time()
+    local cachedData = loadCache()
+
+    if cachedData and (currentTime - cachedData.timestamp) < 3600 then
+        callback(cachedData.quote)
+        return
+    end
+
+    require("plenary.job"):new({
+        command = "curl",
+        args = {"-s", api_url},
+        on_exit = function(job, return_val)
+            if return_val == 0 then
+                local result = table.concat(job:result(), "\n")
+                vim.schedule(function()
+                    local decoded = vim.fn.json_decode(result)
+                    if decoded and decoded.data and decoded.data.content and decoded.data.character and
+                        decoded.data.character.name then
+                        local quote = string.format('"%s" - %s', decoded.data.content, decoded.data.character.name)
+
+                        saveCache(quote, currentTime)
+
+                        callback(wrapText(quote, 64))
+                    else
+                        saveCache('"my penits go boing boing boing - theo"', currentTime)
+                        callback("Error: Could not fetch quote - " .. decoded.message)
+                    end
+                end)
+            else
+                callback("Error: API request failed")
+            end
+        end
+    }):start()
+end
+
+local heading = {
+    type = "text",
+    val = banners[banner and banner or getRandomKey(banners)],
+    opts = {
+        position = "center"
+    }
+}
+
+local footing = {
+    type = "text",
+    val = quote_placeholder,
+    opts = {
+        position = "center"
+    }
+}
+
+local title = {
+    type = "text",
+    val = [[
+	┌── ⋆⋅☆⋅⋆ ──┐
+	   TheoVim
+	└── ⋆⋅☆⋅⋆ ──┘ 
+	]],
+    opts = {
+        position = "center"
+    }
+}
+
+local buttons = {
+    type = "group",
+    val = {btn_gen("  Find File", " LDR f ", "AlphaButtonLabelText", "WildMenu"),
+           btn_gen("  Recents", " LDR r ", "AlphaButtonLabelText", "Boolean"),
+           btn_gen("  Find Word", " LDR fw ", "AlphaButtonLabelText", "String")},
+    opts = {
+        position = "center",
+        spacing = 1
+    }
+}
+
+local layout = {{
+    type = "padding",
+    val = 1
+}, heading, {
+    type = "padding",
+    val = 2
+}, title, {
+    type = "padding",
+    val = 1
+}, buttons, {
+    type = "padding",
+    val = 1
+}, footing}
+
+local options = {
+    layout = layout,
+    opts = {
+        margin = 10
+    }
+}
+
+return {
+    "goolord/alpha-nvim",
+    event = "VimEnter",
+    enabled = true,
+    init = false,
+    dependencies = {"nvim-tree/nvim-web-devicons", "nvim-lua/plenary.nvim"},
+    config = function()
+        require("alpha").setup(options)
+
+        fetchQuote(function(quote)
+            footing.val = quote
+            require("alpha").redraw()
+        end)
+    end
+}
