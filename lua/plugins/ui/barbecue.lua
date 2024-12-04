@@ -1,7 +1,7 @@
 -- Winbar with context.
 return {
     'utilyre/barbecue.nvim',
-    dependencies = {'neovim/nvim-lspconfig', 'SmiteshP/nvim-navic', 'nvim-tree/nvim-web-devicons' -- Optional
+    dependencies = {'neovim/nvim-lspconfig', 'SmiteshP/nvim-navic', 'echasnovski/mini.icons' -- Optional
     },
     -- If you set this to false, floating windows will look weird
     config = {

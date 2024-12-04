@@ -132,7 +132,7 @@ return {
     event = "VimEnter",
     enabled = true,
     init = false,
-    dependencies = {"nvim-tree/nvim-web-devicons", "nvim-lua/plenary.nvim"},
+    dependencies = {"echasnovski/mini.icons", "nvim-lua/plenary.nvim"},
     config = function()
         require("alpha").setup(options)
 
