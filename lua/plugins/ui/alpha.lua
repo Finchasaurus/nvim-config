@@ -1,7 +1,7 @@
 local banners = require("tables.banners")
 local tableUtil = require("util.table")
 local cacheUtil = require("util.cache")
-local strintUtil = require("util.string")
+local stringUtil = require("util.string")
 
 local cachedFile = vim.fn.stdpath("config") .. "/cache/quote.json"
 math.randomseed(os.time())
@@ -34,7 +34,7 @@ local function fetchQuote(callback)
     local cachedData = cacheUtil.loadCache(cachedFile)
 
     if cachedData and (currentTime - cachedData.timestamp) < 3600 then
-        callback(cachedData.quote)
+        callback(stringUtil.wrap(cachedData.quote, 64))
         return
     end
 
@@ -97,9 +97,9 @@ local title = {
 
 local buttons = {
     type = "group",
-    val = {btn_gen("  Find File", " LDR f ", "AlphaButtonLabelText", "WildMenu"),
-           btn_gen("  Recents", " LDR r ", "AlphaButtonLabelText", "Boolean"),
-           btn_gen("  Find Word", " LDR fw ", "AlphaButtonLabelText", "String")},
+    val = {btn_gen("  New File", "n", "AlphaButtonLabelText", "WildMenu"),
+           btn_gen("  Restore Session", "s", "AlphaButtonLabelText", "Boolean"),
+           btn_gen("  Quit", "q", "AlphaButtonLabelText", "Boolean")},
     opts = {
         position = "center",
         spacing = 1
@@ -111,20 +111,17 @@ local layout = {{
     val = 1
 }, heading, {
     type = "padding",
-    val = 2
+    val = 1
 }, title, {
     type = "padding",
-    val = 1
+    val = 0
 }, buttons, {
     type = "padding",
-    val = 1
+    val = 0
 }, footing}
 
 local options = {
-    layout = layout,
-    opts = {
-        margin = 10
-    }
+    layout = layout
 }
 
 return {
