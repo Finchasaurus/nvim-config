@@ -6,7 +6,7 @@ local stringUtil = require("util.string")
 local cachedFile = vim.fn.stdpath("config") .. "/cache/quote.json"
 math.randomseed(os.time())
 
-local banner = nil
+local banner = "kitty"
 local quote_placeholder = "Fetching quote..."
 
 local function btn_gen(label, shortcut, hl_label, hl_icon)
