@@ -1,4 +1,4 @@
-vim.cmd.colorscheme "catppuccin"
+vim.cmd.colorscheme("catppuccin")
 
 vim.opt.relativenumber = false
 vim.opt.shiftwidth = 4
