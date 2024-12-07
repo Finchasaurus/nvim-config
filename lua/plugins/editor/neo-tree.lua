@@ -10,6 +10,17 @@ return {
 		popup_border_style = "rounded",
 		window = {
 			position = "float",
+			popup = {
+				title = "Explorer",
+			},
+		},
+		event_handlers = {
+			{
+				event = "neo_tree_window_before_open",
+				handler = function(args)
+					-- TODO Update popup title on changes somehow
+				end,
+			},
 		},
 	},
 	keys = {
