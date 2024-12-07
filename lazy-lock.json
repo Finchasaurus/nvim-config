@@ -10,7 +10,6 @@
   "luau-lsp.nvim": { "branch": "main", "commit": "513a0af6236e2518d816d0e5721d51544e4e0106" },
   "mini.icons": { "branch": "main", "commit": "54686be7d58807906cb2c8c2216e0bf9c044f19a" },
   "neo-tree.nvim": { "branch": "main", "commit": "42caaf5c3b7ca346ab278201151bb878006a6031" },
-  "nui.nvim": { "branch": "main", "commit": "b58e2bfda5cea347c9d58b7f11cf3012c7b3953f" },
   "nvim-cmp": { "branch": "main", "commit": "ca4d3330d386e76967e53b85953c170658255ecb" },
   "nvim-lspconfig": { "branch": "master", "commit": "64073cbed0ce23e988160bfd1a148a75b6af94cc" },
   "nvim-navic": { "branch": "master", "commit": "8649f694d3e76ee10c19255dece6411c29206a54" },
