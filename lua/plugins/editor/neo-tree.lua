@@ -13,12 +13,29 @@ return {
 			popup = {
 				title = "Explorer",
 			},
+			mappings = {
+				["e"] = function()
+					vim.api.nvim_exec("Neotree float filesystem", true)
+				end,
+				["b"] = function()
+					vim.api.nvim_exec("Neotree float buffers", true)
+				end,
+				["g"] = function()
+					vim.api.nvim_exec("Neotree float git_status", true)
+				end,
+			},
 		},
 		event_handlers = {
 			{
 				event = "neo_tree_window_before_open",
 				handler = function(args)
 					-- TODO Update popup title on changes somehow
+				end,
+			},
+			{
+				event = "file_open_requested",
+				handler = function()
+					require("neo-tree.command").execute({ action = "close" })
 				end,
 			},
 		},
@@ -29,7 +46,7 @@ return {
 			function()
 				require("neo-tree.command").execute({ toggle = true, dir = vim.uv.cwd() })
 			end,
-			desc = "Explorer NeoTree",
+			desc = "Filesystem Explorer",
 		},
 		{
 			"<leader>ge",
