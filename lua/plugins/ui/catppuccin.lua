@@ -42,6 +42,8 @@ return {
 			}),
 		},
 		integrations = {
+			alpha = true,
+			beacon = true,
 			noice = true,
 		},
 		custom_highlights = function(colors)
