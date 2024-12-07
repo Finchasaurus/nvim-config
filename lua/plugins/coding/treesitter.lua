@@ -1,4 +1,26 @@
 return {
 	"nvim-treesitter/nvim-treesitter",
 	lazy = vim.fn.argc(-1) == 0,
+	cmd = { "TSUpdateSync", "TSUpdate", "TSInstall" },
+	opts = {
+		highlight = { enable = true },
+		indent = { enable = true },
+		ensure_installed = {
+			"bash",
+			"html",
+			"javascript",
+			"jsdoc",
+			"json",
+			"jsonc",
+			"lua",
+			"luadoc",
+			"luau",
+			"markdown",
+			"markdown_inline",
+			"regex",
+			"toml",
+			"tsx",
+			"typescript",
+		},
+	},
 }
