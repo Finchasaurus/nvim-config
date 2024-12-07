@@ -41,6 +41,9 @@ return {
 				crust = "#171719",
 			}),
 		},
+		integrations = {
+			noice = true,
+		},
 		custom_highlights = function(colors)
 			return { NeoTreeFloatBorder = { fg = colors.surface1 } }
 		end,
