@@ -118,9 +118,9 @@ local title = {
 local buttons = {
 	type = "group",
 	val = {
-		btn_gen("  New File", "LDR n", "<cmd>ene <CR>"),
-		btn_gen("  Restore Session", "LDR s"),
-		btn_gen("  Quit", "LDR q"),
+		btn_gen("  New File", "n", "<cmd>ene <CR>"),
+		btn_gen("  Restore Session", "s", [[<cmd> lua require("persistence").load() <cr>]]),
+		btn_gen("  Quit", "q", "<cmd> qa <cr>"),
 	},
 	opts = {
 		position = "center",
