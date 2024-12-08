@@ -9,22 +9,35 @@ math.randomseed(os.time())
 local banner = "kitty"
 local quote_placeholder = "Fetching quote..."
 
-local function btn_gen(label, shortcut, hl_label, hl_icon)
+local if_nil = vim.F.if_nil
+local function btn_gen(label, shortcut, bind)
+	local sc = shortcut:gsub("%s", ""):gsub("LDR", "<leader>")
+	print(sc)
+
+	local opts = {
+		position = "center",
+		shortcut = shortcut,
+		cursor = 3,
+		width = 50,
+		align_shortcut = "right",
+		hl_shortcut = "Keyword",
+	}
+
+	if bind then
+		keybind_opts = if_nil(keybind_opts, { noremap = true, silent = true, nowait = true })
+		opts.keymap = { "n", sc, bind, keybind_opts }
+	end
+
+	local function onPress()
+		local key = vim.api.nvim_replace_termcodes(bind or sc .. "<Ignore>", true, false, true)
+		vim.api.nvim_feedkeys(key, "t", false)
+	end
+
 	return {
 		type = "button",
-		on_press = function()
-			local key = api.nvim_replace_termcodes(shortcut:gsub("%s", ""):gsub("LDR", "<leader>"), true, false, true)
-			api.nvim_feedkeys(key, "normal", false)
-		end,
 		val = label,
-		opts = {
-			position = "center",
-			shortcut = shortcut,
-			cursor = 5,
-			width = 25,
-			align_shortcut = "right",
-			hl_shortcut = "AlphaKeyPrefix",
-		},
+		on_press = onPress,
+		opts = opts,
 	}
 end
 
@@ -105,9 +118,9 @@ local title = {
 local buttons = {
 	type = "group",
 	val = {
-		btn_gen("  New File", "n", "AlphaButtonLabelText", "WildMenu"),
-		btn_gen("  Restore Session", "s", "AlphaButtonLabelText", "Boolean"),
-		btn_gen("  Quit", "q", "AlphaButtonLabelText", "Boolean"),
+		btn_gen("  New File", "LDR n", "<cmd>ene <CR>"),
+		btn_gen("  Restore Session", "LDR s"),
+		btn_gen("  Quit", "LDR q"),
 	},
 	opts = {
 		position = "center",
