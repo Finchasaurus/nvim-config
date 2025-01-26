@@ -14,6 +14,7 @@ end
 return {
 	"lopi-py/luau-lsp.nvim",
 	ft = "luau",
+	dependencies = "nvim-lua/plenary.nvim",
 	opts = function()
 		local capabilities = get_capabilities()
 		return {
@@ -30,10 +31,8 @@ return {
 								enabled = true,
 								ignoreGlobs = { "**/_Index/**", "node_modules/**" },
 							},
-						},
-						require = {
-							mode = "relativeToFile",
-							directoryAliases = require("luau-lsp").aliases(),
+							enabled = true,
+							autocompleteEnd = true,
 						},
 						inlayHints = {
 							functionReturnTypes = true,
